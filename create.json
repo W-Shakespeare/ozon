@@ -1,0 +1,301 @@
+// https://seller.ozon.ru/api/v1/item/create
+{
+    "attributes": [
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 115012246,
+                    "sequence": 1,
+                    "value": "Кабель для интернет-соединения",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 8229
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 971841445,
+                    "sequence": 1,
+                    "value": "",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 85
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 61600,
+                    "sequence": 1,
+                    "value": "темно-серый",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 10096
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "2",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 22390
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "1",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 9048
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 34783,
+                    "sequence": 1,
+                    "value": "Для сетевого оборудования",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 5948
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "2",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 6157
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 971214931,
+                    "sequence": 1,
+                    "value": "Медь",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 21652
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "2",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 6468
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 971417785,
+                    "sequence": 1,
+                    "value": "Фабричное производство",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 22270
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "2000",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 4382
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "100",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 4383
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "1",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 8962
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "Кабель сертифицированный, запечатанный\\ь",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 4384
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "1",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 11650
+        },
+        {
+            "unit": 0,
+            "values": [
+                {
+                    "complex_sequence": 0,
+                    "dictionary_value_id": 0,
+                    "sequence": 0,
+                    "value": "5",
+                    "is_default": false
+                }
+            ],
+            "complex_id": 0,
+            "attribute_id": 6036
+        },
+        {
+            "unit": 0,
+            "values": [],
+            "complex_id": 100001,
+            "attribute_id": 21837
+        },
+        {
+            "unit": 0,
+            "values": [],
+            "complex_id": 100001,
+            "attribute_id": 21841
+        },
+        {
+            "unit": 0,
+            "values": [],
+            "complex_id": 100001,
+            "attribute_id": 22273
+        },
+        {
+            "unit": 0,
+            "values": [],
+            "complex_id": 100002,
+            "attribute_id": 21845
+        }
+    ],
+    "barcodes": [
+        "OZN"
+    ],
+    "name": "Кабель питания для V5 Mini, 2 метра, темно-серый",
+    "description_category_id": "17032292",
+    "offer_id": "кб-2м",
+    "price": "6500",
+    "vat": 0,
+    "depth": "140",
+    "width": "140",
+    "height": "40",
+    "weight": "120",
+    "images": [
+        {
+            "uploaded_index": "1",
+            "url": "https://cdn1.ozone.ru/s3/multimedia-tmp-2/item-pic-aa85098ebc031590870fee930c57a2aa.jpg",
+            "title": "2.jpg"
+        },
+        {
+            "uploaded_index": "2",
+            "url": "https://cdn1.ozone.ru/s3/multimedia-tmp-f/item-pic-5b28f095b9c2a617060b947006319541.jpg",
+            "title": "3.jpg"
+        },
+        {
+            "uploaded_index": "3",
+            "url": "https://cdn1.ozone.ru/s3/multimedia-tmp-6/item-pic-92240ca91ed382e68c81cd5e42d62e4d.jpg",
+            "title": "4.jpg"
+        },
+        {
+            "uploaded_index": "4",
+            "url": "https://cdn1.ozone.ru/s3/multimedia-tmp-b/item-pic-f389d4f678bdbe4742b6a19d3a6d8346.jpg",
+            "title": "5.jpg"
+        }
+    ],
+    "company_id": "256431",
+    "contract_id": "11400439133730",
+    "currency": "RUB",
+    "quants": [],
+    "promotions": [
+        {
+            "operation": "disable",
+            "type": "REVIEWS_PROMO"
+        },
+        {
+            "operation": "disable",
+            "type": "INSTALLMENT_PROMO"
+        }
+    ]
+}

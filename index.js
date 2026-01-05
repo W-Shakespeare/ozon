@@ -1,0 +1,357 @@
+import axios from 'axios'
+import { deleteStarlink_gen2_45, starlink_2m, starlink_gen2_45, deleteStarlink_2m } from './data.js';
+
+const API_CONFIG = {
+    baseURL: 'https://api-seller.ozon.ru',
+    headers: {
+        'Client-Id': '256431',
+        'Api-Key': 'e2360f1b-1d61-4c99-a1ee-ba0e9edd4f66',
+        'Content-Type': 'application/json'
+    }
+};
+
+async function updateExistingProduct(data = null, logName = "") {
+    if (data === null) {
+        throw new Error("Не передан объект для создания или обновления товара");
+    }
+
+    console.log(`--- Обновление товара: ${logName || "Без названия"} ---`);
+
+    try {
+        const response = await axios.post(
+            `${API_CONFIG.baseURL}/v3/product/import`,
+            data,
+            { headers: API_CONFIG.headers }
+        );
+
+        console.log("✅ ЗАПРОС ПРИНЯТ!");
+        console.log("Новый ID задачи (task_id):", response.data.result.task_id);
+
+        return response.data; // опционально
+    } catch (error) {
+        console.error(`❌ ОШИБКА ОБНОВЛЕНИЯ (${logName}):`);
+
+        if (error.response) {
+            console.error(JSON.stringify(error.response.data, null, 2));
+        } else {
+            console.error(error.message);
+        }
+
+        throw error; // 🔴 прокидываем выше
+    }
+}
+
+
+// 1020002097228000
+
+async function updateStocks(warehouseId, offerId, count) {
+    console.log(`--- Обновление остатков для товара ${offerId} ---`);
+
+    const stockData = {
+        "stocks": [
+            {
+                "offer_id": offerId,
+                "warehouse_id": warehouseId, // ID склада из списка складов
+                "stock": count // Количество товара в наличии
+            }
+        ]
+    };
+
+    try {
+        const response = await axios.post(`${API_CONFIG.baseURL}/v2/products/stocks`, stockData, {
+            headers: API_CONFIG.headers
+        });
+
+        if (response.data.result[0].updated) {
+            console.log(`✅ Успешно! Для товара "${offerId}" установлено количество: ${count}`);
+        } else {
+            console.warn('⚠️ Озон принял запрос, но статус обновления: false');
+            console.log('Ошибки:', response.data.result[0].errors);
+        }
+
+    } catch (error) {
+        console.error('❌ Ошибка при обновлении остатков:');
+        if (error.response) {
+            console.error(JSON.stringify(error.response.data, null, 2));
+        } else {
+            console.error(error.message);
+        }
+    }
+}
+
+// ПРИМЕР ВЫЗОВА:
+// Допустим, ID склада 12345678, артикул "кб-2м", в наличии 50 штук
+// updateStocks(1020002097228000, "кб-2м-001-461", 30);
+
+
+
+// удаления товара
+
+async function archiveProduct(productId) {
+    console.log(`🚀 Начинаем процесс АРХИВАЦИИ для артикула: ${productId}`);
+    try {
+        const response = await axios.post(`${API_CONFIG.baseURL}/v1/product/archive`, {
+            "product_id": [productId]
+        }, { headers: API_CONFIG.headers });
+
+        console.log('--- Ответ от сервера Ozon (Архивация) ---');
+        console.log(JSON.stringify(response.data, null, 2));
+
+        const result = response.data.result;
+        if (result && result[0]) {
+            if (result[0].status) {
+                console.log(`✅ УСПЕХ: Товар ${productId} в архиве.`);
+            } else {
+                console.log(`❌ ОТКАЗ: Ozon не заархивировал товар.`);
+                console.log('Причина:', result[0].errors);
+            }
+        }
+    } catch (error) {
+        console.error('🔥 КРИТИЧЕСКАЯ ОШИБКА АРХИВАЦИИ:');
+        if (error.response) {
+            console.error('Код:', error.response.status);
+            console.error('Данные:', JSON.stringify(error.response.data, null, 2));
+        } else {
+            console.error(error.message);
+        }
+    }
+}
+
+// Запускаем и ждем завершения
+// archiveProduct("кб-2м").then(() => {
+//     console.log('--- Работа завершена ---');
+// });
+
+// archiveProduct(1188870201).then(() => {
+//     console.log('--- Работа завершена ---');
+// });
+
+
+// Вызов:
+//  archiveProduct("кб-2м");
+// archiveProduct("кб-2м-001-46");
+
+
+// пример
+
+
+
+// start
+
+const needSaleNames = [
+    "Интернет кабель 45м для спутника V2(Gen2)",
+    "Кабель питания для V5 Mini, 2 метра, темно-серый",
+    "Интернет кабель 23м для спутника V2(Gen2)",
+    "Кабель питания для V5 Mini, 20 метров, темно-серый, V5 Mini",
+    "Кабель питания для V5 Mini, 5 метров, темно-серый",
+    "Кабель питания для V5 Mini, 10 метров, темно-серый"
+];
+
+const deleteProduct = (offerId) => ({
+    ["Интернет кабель 45м для спутника V2(Gen2)"]: { objValue: deleteStarlink_gen2_45(offerId) },
+    ["Кабель питания для V5 Mini, 2 метра, темно-серый"]: { objValue: deleteStarlink_2m(offerId) },
+    // "Интернет кабель 23м для спутника V2(Gen2)",
+    // "Кабель питания для V5 Mini, 20 метров, темно-серый, V5 Mini",
+    // "Кабель питания для V5 Mini, 5 метров, темно-серый",
+    // "Кабель питания для V5 Mini, 10 метров, темно-серый"
+})
+
+
+
+const namesObj = {
+    ["Интернет кабель 45м для спутника V2(Gen2)"]: { objValue: starlink_gen2_45(), stock: 12 },
+    ["Кабель питания для V5 Mini, 2 метра, темно-серый"]: { objValue: starlink_2m(), stock: 30 },
+    // "Интернет кабель 23м для спутника V2(Gen2)",
+    // "Кабель питания для V5 Mini, 20 метров, темно-серый, V5 Mini",
+    // "Кабель питания для V5 Mini, 5 метров, темно-серый",
+    // "Кабель питания для V5 Mini, 10 метров, темно-серый"
+};
+
+
+async function fetchAndCheckAllProducts() {
+    try {
+        let allOfferIds = [];
+        let lastId = "";
+        let hasNext = true;
+
+        while (hasNext) {
+            const listRes = await axios.post(
+                `${API_CONFIG.baseURL}/v3/product/list`,
+                {
+                    filter: { visibility: "ALL" },
+                    last_id: lastId,
+                    limit: 1000,
+                },
+                { headers: API_CONFIG.headers }
+            );
+
+            const result = listRes.data.result;
+            const items = result.items || [];
+
+            if (items.length > 0) {
+                allOfferIds.push(...items.map((i) => i.offer_id));
+                lastId = result.last_id;
+            }
+            if (items.length < 1000) hasNext = false;
+        }
+
+        console.log(`✅ Всего артикулов: ${allOfferIds.length}`);
+
+        let allDetails = [];
+        for (let i = 0; i < allOfferIds.length; i += 1000) {
+            const chunk = allOfferIds.slice(i, i + 1000);
+            const infoRes = await axios.post(
+                `${API_CONFIG.baseURL}/v3/product/info/list`,
+                { offer_id: chunk },
+                { headers: API_CONFIG.headers }
+            );
+
+            const details = infoRes.data.result?.items || infoRes.data.items || [];
+            allDetails.push(...details);
+        }
+
+        const startDate = new Date("2026-01-02T00:00:00Z");
+        const now = new Date();
+
+        // 2. Применяем фильтр к полученным данным
+        const filteredProducts = allDetails.filter((p) => {
+            const itemDate = new Date(p.created_at);
+            // Проверяем, что дата товара больше или равна 2 января и меньше или равна "сейчас"
+            return itemDate >= startDate && itemDate <= now;
+        });
+
+        // Сортировка: новые вверху
+        filteredProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        console.log("\n" + "=".repeat(120));
+        console.log(
+            "№   | АРТИКУЛ        | ПРОДАЕТСЯ? | СОЗДАН             | МОДЕРАЦИЯ  | ПРИЧИНА (если не продается)"
+        );
+        console.log("-".repeat(120));
+
+        filteredProducts.forEach((p, i) => {
+            // 1. Извлекаем статус из объекта statuses
+            const statusName = p.statuses?.status_name || "Неизвестно";
+
+            // 2. Проверяем модерацию
+            const moderateStatus = p.statuses?.moderate_status || "Неизвестно";
+            const isApproved = moderateStatus === "approved";
+
+            // 3. Проверяем остатки (has_stock: true в вашем JSON)
+            const hasStock = p.stocks?.has_stock === true;
+
+            // 4. Проверяем видимость
+            const isVisible = p.visible === true;
+
+            let saleStatus = "🔴 НЕТ";
+            let reason = "OK";
+
+            // Условие продажи: статус "Продается" И наличие склада И модерация одобрена
+            if (statusName === "Продается" && hasStock && isApproved) {
+                saleStatus = "✅ ДА";
+            } else {
+                let reasons = [];
+                if (statusName !== "Продается") reasons.push(`Статус: ${statusName}`);
+                if (!hasStock) reasons.push("Нет склада");
+                if (!isApproved) reasons.push(`Модерация: ${moderateStatus}`);
+                if (!isVisible) reasons.push("Скрыт");
+                reason = reasons.join(" | ");
+            }
+
+            const num = (i + 1).toString().padEnd(3);
+            const offerId = (p.offer_id || "---").padEnd(14);
+            const sale = saleStatus.padEnd(10);
+            const date = new Date(p.created_at).toLocaleString("ru-RU").padEnd(18);
+            const mod = moderateStatus.padEnd(10);
+
+            console.log(
+                `${num} | ${offerId} | ${sale} | ${date} | ${mod} | ${reason}`
+            );
+        });
+
+        console.log("-".repeat(120));
+        console.log(`🏁 Готово. Всего проверено: ${filteredProducts.length}`);
+
+
+        const isSale = (p) => p.statusName === "Продается" && p.stocks?.has_stock && p.moderateStatus === "approved"
+
+        const tasks = [];
+
+        for (const p of filteredProducts) {
+            if (needSaleNames.includes(p.name) && !isSale(p)) {
+                console.log(`\n🔄 Обработка товара: ${p.name}`);
+
+                const nameConfig = namesObj[p.name];
+                if (!nameConfig) {
+                    console.warn(`⚠️ Warning: No config found for "${p.name}" in namesObj. Skipping.`);
+                    continue;
+                }
+
+                let newProduct = nameConfig.objValue;
+                let stock = nameConfig.stock;
+
+                // Fix: newProduct is an object { items: [...] }, not an array
+                if (!newProduct.items || !newProduct.items[0]) {
+                    console.error(`❌ Error: Invalid product structure for "${p.name}".`);
+                    continue;
+                }
+
+                let newOfferId = newProduct.items[0].offer_id;
+
+                const deleteProductObj = deleteProduct(p.offer_id);
+                const deleteConfig = deleteProductObj[p.name];
+
+                if (!deleteConfig) {
+                    console.warn(`⚠️ Warning: No delete config found for "${p.name}". Skipping.`);
+                    continue;
+                }
+
+                // Создаем промис для обработки одного товара
+                const task = (async () => {
+                    // 1. Обновляем старую карточку
+                    // changeAndArchiveOldProducts возвращает промис
+                    await changeAndArchiveOldProducts(deleteConfig.objValue, p.id, `ARCHIVE PREP: ${p.name}`);
+
+                    // 2. Создаем/обновляем новую карточку
+                    await updateExistingProduct(newProduct, `NEW CARD: ${p.name}`);
+
+                    // 3. Ждем 15 сек и обновляем стоки
+                    console.log(`⏳ Ожидание 15 сек перед обновлением стоков для ${p.name}...`);
+                    await new Promise(resolve => setTimeout(resolve, 15000));
+                    await updateStocks(1020002097228000, newOfferId, stock);
+                })();
+
+                tasks.push(task);
+            }
+        }
+
+        if (tasks.length > 0) {
+            console.log(`\n⏳ Ожидаем завершения ${tasks.length} задач...`);
+            await Promise.allSettled(tasks);
+            console.log("✅ Все задачи завершены.");
+        } else {
+            console.log("\n✅ Нет активных задач для выполнения.");
+        }
+
+    } catch (error) {
+        console.error("❌ Глобальная ошибка:", error.response?.data || error.message);
+    } finally {
+        process.exit();
+    }
+}
+
+// fetchAndCheckAllProducts();
+
+
+// end
+
+const changeAndArchiveOldProducts = async (obj, id, logName) => {
+    try {
+        await updateExistingProduct(obj, logName);
+        console.log(`⏳ Ожидание 15 сек перед архивацией ${id}...`);
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        await archiveProduct(id);
+    } catch (error) {
+        console.log("❌ Ошибка в changeAndArchiveOldProducts:", error.message);
+    }
+}
