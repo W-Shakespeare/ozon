@@ -1,11 +1,12 @@
 import axios from 'axios'
+import 'dotenv/config'
 import { deleteStarlink_gen2_45, starlink_2m, starlink_gen2_45, deleteStarlink_2m } from './data.js';
 
 const API_CONFIG = {
     baseURL: 'https://api-seller.ozon.ru',
     headers: {
-        'Client-Id': '256431',
-        'Api-Key': 'e2360f1b-1d61-4c99-a1ee-ba0e9edd4f66',
+        'Client-Id': process.env.OZON_CLIENT_ID,
+        'Api-Key': process.env.OZON_API_KEY,
         'Content-Type': 'application/json'
     }
 };
