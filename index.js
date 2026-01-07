@@ -117,6 +117,60 @@ async function archiveProduct(productId) {
     }
 }
 
+async function waitForProductReady(offerId) {
+    console.log(`⏳ Начало ожидания модерации для: ${offerId}`);
+    const maxAttempts = 10; // 10 * 10 сек = 1 минута с задержкой
+    const delay = 10000; // 10 секунд
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const response = await axios.post(
+                `${API_CONFIG.baseURL}/v3/product/info/list`,
+                { offer_id: [offerId] },
+                { headers: API_CONFIG.headers }
+            );
+
+            const item = response.data.result?.items?.[0] || response.data.items?.[0];
+
+            if (item) {
+                const statusName = item.statuses?.status_name;
+                const moderateStatus = item.statuses?.moderate_status;
+                const state = item.statuses?.state;
+                const isCreated = item.statuses?.is_created; // Проверим, есть ли такое поле
+                const validationState = item.statuses?.validation_state;
+
+                console.log(`   [Попытка ${attempt}/${maxAttempts}] Full Statuses: ${JSON.stringify(item.statuses)}`);
+
+                console.log(`   [Попытка ${attempt}/${maxAttempts}] Статус: ${statusName}, Модерация: ${moderateStatus}, Создан: ${isCreated}`);
+
+                // Критерий готовности: Товар создан (is_created: true) И прошел модерацию
+                if (isCreated === true && moderateStatus === 'approved') {
+                    console.log(`✅ Товар ${offerId} успешно создан и прошел модерацию!`);
+                    return true;
+                }
+
+                if (moderateStatus === 'declined') {
+                    console.error(`❌ Товар ${offerId} не прошел модерацию (declined)!`);
+                    return false;
+                }
+            } else {
+                console.log(`   [Попытка ${attempt}/${maxAttempts}] Товар пока не найден в API...`);
+            }
+
+        } catch (error) {
+            console.warn(`   [Попытка ${attempt}/${maxAttempts}] Ошибка проверки статуса: ${error.message}`);
+        }
+
+        // Ждем перед следующей попыткой
+        if (attempt < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+
+    console.error(`⏰ Время ожидания истекло для ${offerId}`);
+    return false;
+}
+
 // Запускаем и ждем завершения
 // archiveProduct("кб-2м").then(() => {
 //     console.log('--- Работа завершена ---');
@@ -232,6 +286,7 @@ async function fetchAndCheckAllProducts() {
         filteredProducts.forEach((p, i) => {
             // 1. Извлекаем статус из объекта statuses
             const statusName = p.statuses?.status_name || "Неизвестно";
+            // ... (rest of the loop)
 
             // 2. Проверяем модерацию
             const moderateStatus = p.statuses?.moderate_status || "Неизвестно";
@@ -315,10 +370,15 @@ async function fetchAndCheckAllProducts() {
                     // 2. Создаем/обновляем новую карточку
                     await updateExistingProduct(newProduct, `NEW CARD: ${p.name}`);
 
-                    // 3. Ждем 15 сек и обновляем стоки
-                    console.log(`⏳ Ожидание 15 сек перед обновлением стоков для ${p.name}...`);
-                    await new Promise(resolve => setTimeout(resolve, 15000));
-                    await updateStocks(1020002097228000, newOfferId, stock);
+                    // 3. Ждем модерации
+                    const isReady = await waitForProductReady(newOfferId);
+
+                    if (isReady) {
+                        console.log(`📦 Товар готов, обновляем стоки для ${p.name}...`);
+                        await updateStocks(1020002097228000, newOfferId, stock);
+                    } else {
+                        console.error(`⚠️ Пропускаем обновление стоков для ${p.name} (не прошел модерацию или таймаут).`);
+                    }
                 })();
 
                 tasks.push(task);

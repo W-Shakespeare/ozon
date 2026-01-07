@@ -50,10 +50,14 @@ export const starlink_gen2_45 = () => ({
             ],
             promotions: [
                 {
-                    operation: "disable",
-                    type: "REVIEWS_PROMO",
+                    "operation": "disable",
+                    "type": "REVIEWS_PROMO"
                 },
-            ],
+                {
+                    "operation": "disable",
+                    "type": "INSTALLMENT_PROMO"
+                }
+            ]
         }
     ]
 });
@@ -106,6 +110,10 @@ export const starlink_2m = () => ({
                     operation: "disable",
                     type: "REVIEWS_PROMO",
                 },
+                {
+                    operation: "disable",
+                    type: "INSTALLMENT_PROMO",
+                }
             ],
         }
     ]
