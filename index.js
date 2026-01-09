@@ -398,6 +398,14 @@ async function fetchAndCheckAllProducts() {
     }
 }
 
+// Принудительно завершить процесс через 5 минут, если он сам не успел
+setTimeout(async () => {
+    const msg = "⏳ Тайм-аут: Скрипт работал слишком долго (5 мин) и был принудительно остановлен.";
+    console.error(msg);
+    await sendTelegramMessage(`⚠️ <b>TIMEOUT:</b> ${msg}`);
+    process.exit(1);
+}, 300000); // 300 000 мс = 5 минут
+
 fetchAndCheckAllProducts();
 // end
 
