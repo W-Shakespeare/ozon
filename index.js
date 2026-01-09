@@ -121,7 +121,7 @@ async function archiveProduct(productId) {
 async function waitForProductReady(offerId) {
     console.log(`⏳ Начало ожидания модерации для: ${offerId}`);
     const maxAttempts = 10; // 10 * 10 сек = 1 минута с задержкой
-    const delay = 10000; // 10 секунд
+    const delay = 20000; // 20 секунд
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
@@ -141,7 +141,6 @@ async function waitForProductReady(offerId) {
                 const validationState = item.statuses?.validation_state;
 
                 console.log(`   [Попытка ${attempt}/${maxAttempts}] Full Statuses: ${JSON.stringify(item.statuses)}`);
-
                 console.log(`   [Попытка ${attempt}/${maxAttempts}] Статус: ${statusName}, Модерация: ${moderateStatus}, Создан: ${isCreated}`);
 
                 // Критерий готовности: Товар создан (is_created: true) И прошел модерацию
@@ -171,24 +170,6 @@ async function waitForProductReady(offerId) {
     console.error(`⏰ Время ожидания истекло для ${offerId}`);
     return false;
 }
-
-// Запускаем и ждем завершения
-// archiveProduct("кб-2м").then(() => {
-//     console.log('--- Работа завершена ---');
-// });
-
-// archiveProduct(1188870201).then(() => {
-//     console.log('--- Работа завершена ---');
-// });
-
-
-// Вызов:
-//  archiveProduct("кб-2м");
-// archiveProduct("кб-2м-001-46");
-
-
-// пример
-
 
 
 // start
@@ -368,7 +349,7 @@ async function fetchAndCheckAllProducts() {
                     // changeAndArchiveOldProducts возвращает промис
                     await changeAndArchiveOldProducts(deleteConfig.objValue, p.id, `ARCHIVE PREP: ${p.name}`);
 
-                    // 2. Создаем/обновляем новую карточку
+                    // 2. Создаем новую карточку
                     await updateExistingProduct(newProduct, `NEW CARD: ${p.name}`);
 
                     // 3. Ждем модерации
@@ -401,7 +382,7 @@ async function fetchAndCheckAllProducts() {
     }
 }
 
-// fetchAndCheckAllProducts();
+fetchAndCheckAllProducts();
 
 
 // end
@@ -410,7 +391,7 @@ const changeAndArchiveOldProducts = async (obj, id, logName) => {
     try {
         await updateExistingProduct(obj, logName);
         console.log(`⏳ Ожидание 15 сек перед архивацией ${id}...`);
-        await new Promise(resolve => setTimeout(resolve, 15000));
+        await new Promise(resolve => setTimeout(resolve, 17000));
         await archiveProduct(id);
     } catch (error) {
         console.log("❌ Ошибка в changeAndArchiveOldProducts:", error.message);

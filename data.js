@@ -7,6 +7,8 @@ export const starlink_gen2_45 = () => ({
         {
             "offer_id": genArticle('каб-45'),
             "name": "Интернет кабель 45м для спутника V2(Gen2)",
+            "reviews_promo": "disable",
+
             "description_category_id": 17028634,
             "type_id": 115012246,
             "price": "12550",
@@ -67,6 +69,8 @@ export const starlink_2m = () => ({
         {
             "offer_id": genArticle('каб-2м'),
             "name": "Кабель питания для V5 Mini, 2 метра, темно-серый",
+            "reviews_promo": "disable",
+
             "description_category_id": 17028634,
             "type_id": 115012246,
             "price": "6500",
@@ -147,9 +151,9 @@ export const deleteStarlink_2m = (offer_id) => ({
             "attributes": [
                 { "id": 8229, "values": [{ "dictionary_value_id": 115012246, "value": "Кабель для интернет-соединения" }] },
                 { "id": 85, "values": [{ "dictionary_value_id": 971841445, "value": "Нет бренда" }] },
-                { "id": 9048, "values": [{ "value": "1" }] }, // Название модели
+                { "id": 9048, "values": [{ "value": "delete" }] }, // Название модели
                 { "id": 10096, values: [{ dictionary_value_id: 61571, value: "белый" }] },
-                { "id": 22390, "values": [{ "value": "2" }] }, // Длина кабеля
+                { "id": 22390, "values": [{ "value": "delete2" }] }, // группа
                 { "id": 5948, "values": [{ "dictionary_value_id": 34783, "value": "Для сетевого оборудования" }] }, // Назначение
                 { "id": 6157, "values": [{ "value": "2" }] }, // Количество выходных разъемов
                 { "id": 21652, "values": [{ "dictionary_value_id": 971214931, "value": "Медь" }] }, // Материал проводника
@@ -197,9 +201,9 @@ export const deleteStarlink_gen2_45 = (offer_id) => ({
             "attributes": [
                 { "id": 8229, "values": [{ "dictionary_value_id": 115012246, "value": "Кабель для интернет-соединения" }] },
                 { "id": 85, "values": [{ "dictionary_value_id": 971841445, "value": "Нет бренда" }] },
-                { "id": 9048, "values": [{ "value": "одд2" }] }, // Название модели
+                { "id": 9048, "values": [{ "value": "delete" }] }, // Название модели
                 { "id": 10096, "values": [{ "dictionary_value_id": 61571, "value": "белый" }] },
-                { "id": 22390, "values": [{ "value": "gen" }] }, // Длина кабеля
+                { "id": 22390, "values": [{ "value": "delete2" }] }, // Длина кабеля
                 { "id": 5948, "values": [{ "dictionary_value_id": 34783, "value": "Для сетевого оборудования" }] }, // Назначение
                 // { "id": 6157, "values": [{ "value": "2" }] }, // Количество выходных разъемов
                 { "id": 21652, "values": [{ "dictionary_value_id": 971214931, "value": "Медь" }] }, // Материал проводника
