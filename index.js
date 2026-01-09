@@ -1,6 +1,7 @@
 import axios from 'axios'
 import 'dotenv/config'
 import { deleteStarlink_gen2_45, starlink_2m, starlink_gen2_45, deleteStarlink_2m } from './data.js';
+import { sendTelegramMessage } from './telegram.js';
 
 const API_CONFIG = {
     baseURL: 'https://api-seller.ozon.ru',
@@ -79,12 +80,6 @@ async function updateStocks(warehouseId, offerId, count) {
         }
     }
 }
-
-// ПРИМЕР ВЫЗОВА:
-// Допустим, ID склада 12345678, артикул "кб-2м", в наличии 50 штук
-// updateStocks(1020002097228000, "кб-2м-001-461", 30);
-
-
 
 // удаления товара
 
@@ -204,7 +199,11 @@ const namesObj = {
 };
 
 
+
+
 async function fetchAndCheckAllProducts() {
+    const errors = []; // Массив для сбора ошибок
+
     try {
         let allOfferIds = [];
         let lastId = "";
@@ -330,6 +329,7 @@ async function fetchAndCheckAllProducts() {
                 // Fix: newProduct is an object { items: [...] }, not an array
                 if (!newProduct.items || !newProduct.items[0]) {
                     console.error(`❌ Error: Invalid product structure for "${p.name}".`);
+                    errors.push(`❌ <b>${p.name}</b>: Invalid product structure (config error).`);
                     continue;
                 }
 
@@ -345,21 +345,27 @@ async function fetchAndCheckAllProducts() {
 
                 // Создаем промис для обработки одного товара
                 const task = (async () => {
-                    // 1. Обновляем старую карточку
-                    // changeAndArchiveOldProducts возвращает промис
-                    await changeAndArchiveOldProducts(deleteConfig.objValue, p.id, `ARCHIVE PREP: ${p.name}`);
+                    try {
+                        // 1. Обновляем старую карточку
+                        // changeAndArchiveOldProducts возвращает промис
+                        await changeAndArchiveOldProducts(deleteConfig.objValue, p.id, `ARCHIVE PREP: ${p.name}`);
 
-                    // 2. Создаем новую карточку
-                    await updateExistingProduct(newProduct, `NEW CARD: ${p.name}`);
+                        // 2. Создаем новую карточку
+                        await updateExistingProduct(newProduct, `NEW CARD: ${p.name}`);
 
-                    // 3. Ждем модерации
-                    const isReady = await waitForProductReady(newOfferId);
+                        // 3. Ждем модерации
+                        const isReady = await waitForProductReady(newOfferId);
 
-                    if (isReady) {
-                        console.log(`📦 Товар готов, обновляем стоки для ${p.name}...`);
-                        await updateStocks(1020002097228000, newOfferId, stock);
-                    } else {
-                        console.error(`⚠️ Пропускаем обновление стоков для ${p.name} (не прошел модерацию или таймаут).`);
+                        if (isReady) {
+                            console.log(`📦 Товар готов, обновляем стоки для ${p.name}...`);
+                            await updateStocks(1020002097228000, newOfferId, stock);
+                        } else {
+                            throw new Error("Не прошел модерацию или таймаут");
+                        }
+                    } catch (err) {
+                        const errMsg = `❌ <b>${p.name}</b>: ${err.message}`;
+                        console.error(errMsg);
+                        errors.push(errMsg);
                     }
                 })();
 
@@ -377,14 +383,22 @@ async function fetchAndCheckAllProducts() {
 
     } catch (error) {
         console.error("❌ Глобальная ошибка:", error.response?.data || error.message);
+        errors.push(`🔥 <b>CRITICAL ERROR:</b> ${error.message}`);
     } finally {
+        if (errors.length > 0) {
+            console.log(`\n⚠️ Есть ошибки (${errors.length}). Отправляем отчет в Telegram...`);
+            const report = `🚨 <b>Отчет о сбоях Ozon:</b>\n\n${errors.join('\n')}`;
+            await sendTelegramMessage(report);
+        } else {
+            console.log('___________________________________');
+            console.log('\n✨ Работа завершена без ошибок.');
+            await sendTelegramMessage("✅ Скрипт Ozon успешно завершил работу. Ошибок нет.");
+        }
         process.exit();
     }
 }
 
 fetchAndCheckAllProducts();
-
-
 // end
 
 const changeAndArchiveOldProducts = async (obj, id, logName) => {
