@@ -59,26 +59,47 @@ async function updateStocks(warehouseId, offerId, count) {
         ]
     };
 
-    try {
-        const response = await axios.post(`${API_CONFIG.baseURL}/v2/products/stocks`, stockData, {
-            headers: API_CONFIG.headers
-        });
+    const maxRetries = 3;
+    const retryDelay = 10000; // 10 секунд
 
-        if (response.data.result[0].updated) {
-            console.log(`✅ Успешно! Для товара "${offerId}" установлено количество: ${count}`);
-        } else {
-            console.warn('⚠️ Озон принял запрос, но статус обновления: false');
-            console.log('Ошибки:', response.data.result[0].errors);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await axios.post(`${API_CONFIG.baseURL}/v2/products/stocks`, stockData, {
+                headers: API_CONFIG.headers
+            });
+
+            if (response.data.result[0].updated) {
+                console.log(`✅ Успешно! Для товара "${offerId}" установлено количество: ${count}`);
+                return; // Выходим из функции, если всё ок
+            } else {
+                console.warn(`⚠️ [Попытка ${attempt}/${maxRetries}] Озон принял запрос, но статус обновления: false`);
+                const errors = response.data.result[0].errors || [];
+                console.log('Ошибки:', errors);
+
+                // Ошибка "тегов" (товар еще не прожеван Озоном)
+                const isTagError = errors.some(e => e.code === 'PRODUCT_HAS_NOT_BEEN_TAGGED_YET');
+                if (isTagError) {
+                    console.log(`ℹ️ Товар еще не прошел внутреннюю обработку тегов (TAG_ERROR). Ждем...`);
+                }
+            }
+
+        } catch (error) {
+            console.error(`❌ [Попытка ${attempt}/${maxRetries}] Ошибка при обновлении остатков:`);
+            if (error.response) {
+                console.error(JSON.stringify(error.response.data, null, 2));
+            } else {
+                console.error(error.message);
+            }
         }
 
-    } catch (error) {
-        console.error('❌ Ошибка при обновлении остатков:');
-        if (error.response) {
-            console.error(JSON.stringify(error.response.data, null, 2));
-        } else {
-            console.error(error.message);
+        if (attempt < maxRetries) {
+            console.log(`⏳ Ждем ${retryDelay / 1000} сек перед повтором обновления остатков...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
     }
+
+    // Если прошли все попытки и не вышли
+    throw new Error(`Не удалось обновить остатки после ${maxRetries} попыток.`);
 }
 
 // удаления товара
@@ -309,7 +330,7 @@ async function fetchAndCheckAllProducts() {
         console.log(`🏁 Готово. Всего проверено: ${filteredProducts.length}`);
 
 
-        const isSale = (p) => p.statusName === "Продается" && p.stocks?.has_stock && p.moderateStatus === "approved"
+        const isSale = (p) => p.statuses?.status_name === "Продается" && p.stocks?.has_stock && p.statuses?.moderate_status === "approved"
 
         const tasks = [];
 
