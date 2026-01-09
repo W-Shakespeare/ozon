@@ -413,7 +413,7 @@ async function fetchAndCheckAllProducts() {
         } else {
             console.log('___________________________________');
             console.log('\n✨ Работа завершена без ошибок.');
-            await sendTelegramMessage("✅ Скрипт Ozon успешно завершил работу. Ошибок нет.");
+            // await sendTelegramMessage("✅ Скрипт Ozon успешно завершил работу. Ошибок нет.");
         }
         process.exit();
     }
