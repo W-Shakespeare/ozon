@@ -224,6 +224,7 @@ const namesObj = {
 
 async function fetchAndCheckAllProducts() {
     const errors = []; // Массив для сбора ошибок
+    const createdProducts = []; // Массив для успешно созданных товаров
 
     try {
         let allOfferIds = [];
@@ -380,6 +381,7 @@ async function fetchAndCheckAllProducts() {
                         if (isReady) {
                             console.log(`📦 Товар готов, обновляем стоки для ${p.name}...`);
                             await updateStocks(1020002097228000, newOfferId, stock);
+                            createdProducts.push(p.name);
                         } else {
                             throw new Error("Не прошел модерацию или таймаут");
                         }
@@ -406,6 +408,12 @@ async function fetchAndCheckAllProducts() {
         console.error("❌ Глобальная ошибка:", error.response?.data || error.message);
         errors.push(`🔥 <b>CRITICAL ERROR:</b> ${error.message}`);
     } finally {
+        if (createdProducts.length > 0) {
+            console.log(`\n🎉 Успешно создано товаров: ${createdProducts.length}. Отправляем отчет в Telegram...`);
+            const successReport = `✅ <b>Успешно созданы новые карточки:</b>\n\n${createdProducts.map((name, i) => `${i + 1}. ${name}`).join('\n')}`;
+            await sendTelegramMessage(successReport);
+        }
+
         if (errors.length > 0) {
             console.log(`\n⚠️ Есть ошибки (${errors.length}). Отправляем отчет в Telegram...`);
             const report = `🚨 <b>Отчет о сбоях Ozon:</b>\n\n${errors.join('\n')}`;
